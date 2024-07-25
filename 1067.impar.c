@@ -8,7 +8,7 @@ int main() {
       a += 1;
       printf("%d\n", a);
       a += 2;
-    } else if (a % 2 == 1) {
+    } else if (a % 2 != 0) {
       printf("%d\n", a);
       a+=2;
     }

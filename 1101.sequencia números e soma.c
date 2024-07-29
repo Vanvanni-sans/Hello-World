@@ -5,7 +5,7 @@ int x, y, min, max,count=0;
     {
       scanf("%d %d", &x, &y);
       if(x<=0 || y<=0){
-        return 0;
+        j++;
       }
       else {
   if(x<y)

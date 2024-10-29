@@ -14,18 +14,24 @@ typedef struct TListDE{
   Tnode *first;
   Tnode *last;
   int len;
-} TListDe;
+} TListDE;
 
 //funçao de incialização da lista
 void initList (TListDE *L);
 
-void deleteList (TListDE *L);
+void deletList (TListDE *L);
+
+void deletfirst(TListDE *L);
+
+void deletnum(TListDE *L, int n);
+
+void deletlast(TListDE *L);
 
 void printList(TListDE L, bool dir);
 
-void insertLeft(Tdata x, TListDE *L);
+int insertLeft(Tdata x, TListDE *L);
 
-void insertRight(Tdata x, TListDE *L);
+int insertRight(Tdata x, TListDE *L);
 
 //listde.c////////////////////////////////////////////////////
 
@@ -34,13 +40,13 @@ void insertRight(Tdata x, TListDE *L);
 #include <stdbool.h>
 #include "ListDE.h"
 
-void initList(TListDe *L){
+void initList(TListDE *L){
   L->first = NULL;
   L->last = NULL;
   L->len = 0;
 }
 
-void deletlist(TListDe *L){
+void deletList(TListDE *L){
   Tnode *aux = L -> first;
   while (aux){
     L->first = L->first->next;
@@ -50,7 +56,7 @@ void deletlist(TListDe *L){
   L->len = 0;
 }
 
-void printList(TListDe L, bool dir){
+void printList(TListDE L, bool dir){
   Tnode *aux;
 
   if(!dir){
@@ -73,7 +79,7 @@ void printList(TListDe L, bool dir){
   return;
 }
 
-int insetLeft(Tdata x, TListDe *L){
+int insertLeft(Tdata x, TListDE *L){
   Tnode *aux;
   aux = (Tnode*)malloc(sizeof(Tnode));
   if (aux == NULL)//falha na alocação
@@ -92,7 +98,7 @@ int insetLeft(Tdata x, TListDe *L){
   }
 }
 
-int insetRight(Tdata x, TListDe *L){
+int insertRight(Tdata x, TListDE *L){
   Tnode *aux =(Tnode*)malloc(sizeof(Tnode));
   if (aux == NULL)//falha na alocação
     return 1;//sinaliza com erro, deixando a lista original intacta 
@@ -112,18 +118,81 @@ int insetRight(Tdata x, TListDe *L){
   }
 }
 
+void deletfirst(TListDE *L){
+  Tnode *aux;
+  aux = L->first;
+  L->first = L->first->next;
+  free(aux);
+  L->first->prev=NULL;
+  L->len --;
+  if(L->len == 0)
+    L->last = NULL;
+  return;
+}
+
+void deletlast(TListDE *L){
+  Tnode *aux;
+  aux = L->last;
+  L->last = L->last->prev;
+  free(aux);
+  L->last->next=NULL;
+  L->len --;
+  if(L->len == 0)
+    L->first = NULL;
+  return;
+}
+
+void deletnum(TListDE *L, int n){
+Tnode *aux = L-> first, *aux2, *aux3, *auxpos;
+  if(n==0)
+    deletfirst(L);
+  else if(n==L->len-1)
+    deletlast(L);
+  else if(n==1){
+    aux = L->first->next;
+    L->first->next=aux->next;
+    free(aux);
+    aux2 = L->first->next;
+    aux2 -> prev = L->first;
+  }else if(n==L->len-2){
+      aux = L->last->prev;
+      L->last->prev=aux->prev;
+      free(aux);
+      aux2 = L->last->prev;
+      aux2 -> next = L->last;
+  }
+  else if(n>1 && n<L->len-2){
+    for(int i = 0; i<n/2 ;i++){
+      aux2 = aux->next;
+      aux = aux2->next;
+    }
+    if(n%2==0){//numeros pares
+      aux3=aux->next;
+      free(aux);
+      aux2->next = aux3;
+      aux3->prev = aux2;
+    }else{//numeros impares
+      aux3=aux->next;
+      aux2=aux3->next;
+      free(aux3);
+      aux->next=aux2;
+      aux2->prev=aux;
+    }
+  }
+}
+
 //main.c///////////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 #include <stdbool.h>
 #include "ListDE.h"
 
 int main(){
-  
-TListDe L;
+
+TListDE L;
 int erro = 0;
-  
+
 initList(&L);
-  
+
   for (int i=0; i<5; i++){
     erro = insertLeft(i, &L);
     if(erro){
@@ -132,7 +201,7 @@ initList(&L);
   printList(L, false);
   puts("\n");
   }
-  
+
   for (int i=0; i<5; i++){
     erro = insertRight(i, &L);
     if(erro){
@@ -142,7 +211,11 @@ initList(&L);
   puts("\n");
   }
 
+  deletnum(&L, 7);
+  printList(L, false);
+  puts("\n");
+  
 
-  deleteList(&L);
+  deletList(&L);
   printList(L, false);
 }
